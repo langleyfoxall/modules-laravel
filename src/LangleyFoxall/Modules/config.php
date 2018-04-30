@@ -3,7 +3,7 @@ return [
 
 	'paths' => [
 		'modules'    => app_path('Modules'),
-		'template'   => base_path('LangleyFoxall/Modules/Template'),
+		'template'   => base_path('vendor/langleyfoxall/modules-laravel/src/LangleyFoxall/Modules/Template'),
 		'assets'     => public_path('modules'),
 		'migrations' => base_path('database/migrations'),
 		'base_path'  => base_path('LangleyFoxall/Modules'),
