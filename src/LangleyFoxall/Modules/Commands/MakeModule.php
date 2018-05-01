@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 use LangleyFoxall\Modules\Traits\CommandNamespace;
 use LangleyFoxall\Modules\Helpers\ModuleGenerator;
-use LangleyFoxall\Modules\Modules\MissingModuleException;
+use LangleyFoxall\Modules\Exceptions\MissingModuleException;
 
 class MakeModule extends Command
 {

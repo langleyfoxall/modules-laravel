@@ -1,26 +1,33 @@
 <?php
+$BASE_PATH = base_path('vendor/langleyfoxall/modules-laravel/src/LangleyFoxall/Modules');
+
 return [
 
 	'paths' => [
-		'modules'    => app_path('Modules'),
-		'template'   => base_path('vendor/langleyfoxall/modules-laravel/src/LangleyFoxall/Modules/Template'),
-		'assets'     => public_path('modules'),
-		'migrations' => base_path('database/migrations'),
-		'base_path'  => base_path('LangleyFoxall/Modules'),
+		'modules'   => app_path('Modules'),
+		'template'  => $BASE_PATH . DIRECTORY_SEPARATOR . '/Template',
+		'base_path' => $BASE_PATH,
 	],
 
 	'module' => [
 		'consts' => [
 			'sanitize' => [ '_', '-', ' ' ],
-			'ignore'   => [ 'Views', 'Modules' ],
-			'gitkeep' => true
+			'ignore'   => [ 'Views', 'Modules', 'Widgets' ],
+			'gitkeep'  => true
+		],
+	],
+
+	'widget' => [
+		'consts' => [
+			'sanitize' => [ '_', '-', ' ' ],
+			'ignore'   => [ 'Views', 'Modules', 'Widgets' ],
+			'skip'     => [ 'Modules', 'Widgets' ],
+			'gitkeep'  => true
 		],
 	],
 
 	'register' => [
 		'files' => 'register',
 	],
-
-	'modules' => [],
 
 ];

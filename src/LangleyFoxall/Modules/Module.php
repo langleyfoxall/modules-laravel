@@ -5,7 +5,8 @@ namespace LangleyFoxall\Modules;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
-use LangleyFoxall\Modules\Modules\MissingSubModuleException;
+use LangleyFoxall\Modules\Exceptions\MissingSubModuleException;
+use LangleyFoxall\Modules\Exceptions\MissingWidgetException;
 use LangleyFoxall\Modules\Traits\Common;
 
 use SplFileInfo;
@@ -27,8 +28,11 @@ class Module extends ServiceProvider
 	/** @var string[] $files */
 	private $files = [];
 
-	/** @var array $sub_modules */
+	/** @var Module[] $sub_modules */
 	private $sub_modules = [];
+
+	/** @var Widget[] $widgets */
+	private $widgets = [];
 
 	/**
 	 * Module constructor.
@@ -49,6 +53,7 @@ class Module extends ServiceProvider
 
 		$this->setPath($path);
 		$this->setSubModules();
+		$this->setWidgets();
 	}
 
 	public function register()
@@ -74,7 +79,7 @@ class Module extends ServiceProvider
 		$this->loadFiles();
 		$this->registerProviders();
 
-		$this->loadMigrationsFrom($this->getPath() . '/Migrations');
+		$this->loadMigrationsFrom($this->getPath() . '/Database/Migrations');
 		$this->loadViewsFrom($this->getPath() . '/Views', Helper::getModuleReference($this->name, ''));
 	}
 
@@ -129,6 +134,33 @@ class Module extends ServiceProvider
 	}
 
 	/**
+	 * @param Widget|string $widget
+	 * @throws MissingWidgetException
+	 * @return bool
+	 */
+	public function deleteWidget($widget)
+	{
+		if (is_string($widget)) {
+			$reference = Helper::getModuleReference($widget);
+
+			if (!array_key_exists($reference, $this->getWidgets())) {
+				throw new MissingWidgetException;
+			}
+
+			$widget = $this->getWidgets()[ $reference ];
+		} else {
+			/** @var Widget $widget */
+			$reference = $widget->getReference();
+		}
+
+		$widget->delete();
+
+		unset($this->sub_modules[ $reference ]);
+
+		return true;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getReference()
@@ -157,6 +189,14 @@ class Module extends ServiceProvider
 	}
 
 	/**
+	 * @return Widget[]
+	 */
+	public function getWidgets()
+	{
+		return $this->widgets;
+	}
+
+	/**
 	 * @param string $path
 	 * @return string
 	 */
@@ -182,6 +222,25 @@ class Module extends ServiceProvider
 		}
 
 		return $this->sub_modules;
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function setWidgets()
+	{
+		$this->widgets = [];
+		$directories   = array_filter(glob("{$this->getPath()}/Widgets/*"), 'is_dir');
+
+		/** @var SplFileInfo $item */
+		foreach ($directories as $path) {
+			$bits   = explode('/', $path);
+			$widget = end($bits);
+
+			$this->widgets[ $widget ] = new Widget($this->app, $widget, $path);
+		}
+
+		return $this->widgets;
 	}
 
 	/**

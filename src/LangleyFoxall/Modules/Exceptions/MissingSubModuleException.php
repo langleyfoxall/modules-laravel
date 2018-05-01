@@ -1,6 +1,6 @@
 <?php
 
-namespace LangleyFoxall\Modules\Modules;
+namespace LangleyFoxall\Modules\Exceptions;
 
 
 class MissingSubModuleException extends \Exception

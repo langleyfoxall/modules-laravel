@@ -9,15 +9,18 @@ class Helper
 	/**
 	 * @param string $name
 	 * @param string $delimiter
+	 * @param bool   $module
 	 * @return string
 	 */
-	public static function getModuleReference(string $name, string $delimiter = '.')
+	public static function getModuleReference(string $name, string $delimiter = '.', bool $module = true)
 	{
 		$reference = '';
 		$bits      = explode('.', $name);
 
+		$replace = config(($module ? 'modules.module.sanitize' : 'modules.widget.sanitize'), '');
+
 		foreach ($bits as $name) {
-			$reference .= str_replace(config('modules.module.sanitize', ''), '', Str::title($name));
+			$reference .= str_replace($replace, '', Str::ucfirst($name));
 			$reference .= $delimiter;
 		}
 
@@ -27,9 +30,10 @@ class Helper
 	/**
 	 * @param string $name
 	 * @param array  $parents
+	 * @param bool   $module
 	 * @return string
 	 */
-	public static function getModuleNamespace(string $name, array $parents = [])
+	public static function getModuleNamespace(string $name, array $parents = [], bool $module = true)
 	{
 		$namespace = 'App\\Modules\\';
 
@@ -41,15 +45,20 @@ class Helper
 			$namespace .= self::getModuleReference($parent) . '\\Modules\\';
 		}
 
+		if (!$module) {
+			$namespace = preg_replace('/\\\Modules\\\$/', '\\Widgets\\', $namespace);
+		}
+
 		return $namespace . self::getModuleReference($name);
 	}
 
 	/**
 	 * @param string $name
 	 * @param array  $parents
+	 * @param bool   $module
 	 * @return string
 	 */
-	public static function getModulePath(string $name, array $parents = [])
+	public static function getModulePath(string $name, array $parents = [], bool $module = true)
 	{
 		$path = config('modules')[ 'paths' ][ 'modules' ] . DIRECTORY_SEPARATOR;
 
@@ -59,6 +68,10 @@ class Helper
 
 		foreach ($parents as $parent) {
 			$path .= self::getModuleReference($parent) . DIRECTORY_SEPARATOR . 'Modules' . DIRECTORY_SEPARATOR;
+		}
+
+		if (!$module) {
+			$path = preg_replace('/\/Modules\/$/', '/Widgets/', $path);
 		}
 
 		return $path . self::getModuleReference($name);
