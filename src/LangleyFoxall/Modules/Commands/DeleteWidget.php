@@ -9,37 +9,37 @@ use LangleyFoxall\Modules\Repository;
 use LangleyFoxall\Modules\Traits\CommandNamespace;
 use LangleyFoxall\Modules\Exceptions\MissingModuleException;
 
-class DeleteModule extends Command
+class DeleteWidget extends Command
 {
 	use CommandNamespace;
 
 	/** @var string $signature */
-	protected $signature = 'modules:delete {module}';
+	protected $signature = 'modules:delete-widget {widget}';
 
 	/** @var string $description */
-	protected $description = 'Delete a Langley Foxall Module';
+	protected $description = 'Delete a Langley Foxall Module Widget';
 
 	public function handle()
 	{
 		try {
-			$reference = Helper::getModuleReference($this->argument('module'));
+			$reference = Helper::getModuleReference($this->argument('widget'));
 
 			/** @var Repository $modules */
 			$modules = app('modules');
 
-			if (!$modules->hasSubModule($reference)) {
+			if (!$modules->hasWidget($reference)) {
 				throw new MissingModuleException;
 			}
 
-			if ($modules->hasSubModules($reference)) {
-				if (!$this->confirm('This module has sub modules, are you sure you want to delete it?')) {
-					$this->info('Module deletion cancelled');
+			if ($modules->hasWidgets($reference)) {
+				if (!$this->confirm('This module has widgets, are you sure you want to delete it?')) {
+					$this->info('Widget deletion cancelled');
 
 					return;
 				}
 			}
 
-			$modules->deleteSubModule($reference);
+			$modules->deleteWidget($reference);
 
 			$this->info('Module successfully deleted');
 		} catch (MissingModuleException $e) {

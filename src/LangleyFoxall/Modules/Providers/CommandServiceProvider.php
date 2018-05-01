@@ -5,8 +5,10 @@ namespace LangleyFoxall\Modules\Providers;
 use Illuminate\Support\ServiceProvider;
 
 use LangleyFoxall\Modules\Commands\DeleteModule;
+use LangleyFoxall\Modules\Commands\DeleteWidget;
 use LangleyFoxall\Modules\Commands\MakeModule;
 use LangleyFoxall\Modules\Commands\MakeModuleConfig;
+use LangleyFoxall\Modules\Commands\MakeWidget;
 
 class CommandServiceProvider extends ServiceProvider
 {
@@ -16,8 +18,12 @@ class CommandServiceProvider extends ServiceProvider
 	/** @var string[] $commands */
 	protected $commands = [
 		MakeModuleConfig::class,
+
 		MakeModule::class,
-		DeleteModule::class
+		DeleteModule::class,
+
+		MakeWidget::class,
+		DeleteWidget::class
 	];
 
 	public function register()

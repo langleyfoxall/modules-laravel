@@ -5,9 +5,11 @@ namespace LangleyFoxall\Modules;
 use Illuminate\Container\Container;
 
 use LangleyFoxall\Modules\Traits\Common;
-use LangleyFoxall\Modules\Modules\MissingModuleException;
-use LangleyFoxall\Modules\Modules\MissingSubModuleException;
-use LangleyFoxall\Modules\Modules\ModuleHasSubModulesException;
+use LangleyFoxall\Modules\Exceptions\MissingModuleException;
+use LangleyFoxall\Modules\Exceptions\MissingSubModuleException;
+use LangleyFoxall\Modules\Exceptions\ModuleHasSubModulesException;
+use LangleyFoxall\Modules\Exceptions\MissingWidgetException;
+use LangleyFoxall\Modules\Exceptions\ModuleHasWidgetsException;
 
 class Repository
 {
@@ -16,7 +18,7 @@ class Repository
 	/** @var $app */
 	protected $app;
 
-	/** @var array $modules */
+	/** @var Module[] $modules */
 	private $modules = [];
 
 	/**
@@ -43,6 +45,11 @@ class Repository
 			foreach ($module->getSubModules() as $sub_module) {
 				$sub_module->register();
 			}
+
+			/** @var Widget $widget */
+			foreach ($module->getWidgets() as $widget) {
+				$widget->register();
+			}
 		}
 	}
 
@@ -56,6 +63,11 @@ class Repository
 			foreach ($module->getSubModules() as $sub_module) {
 				$sub_module->boot();
 			}
+
+			/** @var Widget $widget */
+			foreach ($module->getWidgets() as $widget) {
+				$widget->boot();
+			}
 		}
 	}
 
@@ -65,7 +77,7 @@ class Repository
 	 */
 	public function createModule(string $name)
 	{
-		$module = new Module($this->app, strtolower($name));
+		$module = new Module($this->app, $name);
 		$module->scan();
 
 		$this->modules[ $module->getReference() ] = &$module;
@@ -87,7 +99,7 @@ class Repository
 	 * @throws MissingModuleException
 	 * @return bool
 	 */
-	public function has(string $name)
+	public function hasSubModule(string $name)
 	{
 		$bits = explode('.', $name);
 		$name = array_pop($bits);
@@ -107,15 +119,45 @@ class Repository
 
 	/**
 	 * @param string $name
-	 * @param bool $throw
+	 * @throws MissingModuleException
+	 * @return bool
+	 */
+	public function hasWidget(string $name)
+	{
+		$bits   = explode('.', $name);
+		$length = count($bits);
+
+		$name = array_pop($bits);
+
+		$scope = $this->modules;
+
+		foreach ($bits as $key => $bit) {
+			if (!array_key_exists($bit, $scope)) {
+				throw new MissingModuleException($bit);
+			}
+
+			if ($key != ($length - 1)) {
+				$scope = $scope[ $bit ]->getSubModules();
+			} else {
+				$scope = $scope[ $bit ]->getWidgets();
+			}
+		}
+
+		return array_key_exists($name, $scope);
+	}
+
+	/**
+	 * @param string $name
+	 * @param bool   $throw
 	 * @throws MissingModuleException
 	 * @throws ModuleHasSubModulesException
+	 * @throws MissingSubModuleException
 	 * @return bool
 	 */
 	public function hasSubModules(string $name, bool $throw = false)
 	{
 		/** @var Module $module */
-		list($module, $parent) = $this->get($name);
+		list($module, $parent) = $this->getSubModule($name);
 
 		if (!empty($module->getSubModules())) {
 			if ($throw) {
@@ -130,10 +172,35 @@ class Repository
 
 	/**
 	 * @param string $name
+	 * @param bool   $throw
 	 * @throws MissingModuleException
+	 * @throws ModuleHasWidgetsException
+	 * @throws MissingWidgetException
+	 * @return bool
+	 */
+	public function hasWidgets(string $name, bool $throw = false)
+	{
+		/** @var Module $module */
+		list($module, $parent) = $this->getWidget($name);
+
+		if (!empty($module->getWidgets())) {
+			if ($throw) {
+				throw new ModuleHasWidgetsException;
+			} else {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param string $name
+	 * @throws MissingModuleException
+	 * @throws MissingSubModuleException
 	 * @return array
 	 */
-	public function get(string $name)
+	public function getSubModule(string $name)
 	{
 		$bits = explode('.', $name);
 		$name = array_pop($bits);
@@ -150,7 +217,41 @@ class Repository
 		}
 
 		if (!array_key_exists($name, $scope)) {
-			throw new MissingModuleException($name);
+			throw new MissingSubModuleException($name);
+		}
+
+		return [ $scope[ $name ], $parent ];
+	}
+
+	/**
+	 * @param string $name
+	 * @throws MissingModuleException
+	 * @throws MissingWidgetException
+	 * @return array
+	 */
+	public function getWidget(string $name)
+	{
+		$bits   = explode('.', $name);
+		$length = count($bits);
+		$name   = array_pop($bits);
+
+		$parent = null;
+		$scope  = $this->modules;
+
+		foreach ($bits as $key => $bit) {
+			if (!array_key_exists($bit, $scope)) {
+				throw new MissingModuleException($bit);
+			}
+
+			if ($key != ($length - 1)) {
+				$scope = $scope[ $bit ]->getSubModules();
+			} else {
+				$scope = $scope[ $bit ]->getWidgets();
+			}
+		}
+
+		if (!array_key_exists($name, $scope)) {
+			throw new MissingWidgetException($name);
 		}
 
 		return [ $scope[ $name ], $parent ];
@@ -162,13 +263,13 @@ class Repository
 	 * @throws MissingSubModuleException
 	 * @return bool
 	 */
-	public function delete(string $name)
+	public function deleteSubModule(string $name)
 	{
 		/**
-		 * @var Module $module
+		 * @var Module      $module
 		 * @var Module|null $parent
 		 */
-		list($module, $parent) = $this->get($name);
+		list($module, $parent) = $this->getSubModule($name);
 
 		if (is_null($parent)) {
 			$module->delete();
@@ -177,6 +278,31 @@ class Repository
 		}
 
 		$parent->deleteSubModule($module);
+
+		return true;
+	}
+
+	/**
+	 * @param string $name
+	 * @throws MissingModuleException
+	 * @throws MissingWidgetException
+	 * @return bool
+	 */
+	public function deleteWidget(string $name)
+	{
+		/**
+		 * @var Module      $module
+		 * @var Module|null $parent
+		 */
+		list($widget, $parent) = $this->getWidget($name);
+
+		if (is_null($parent)) {
+			$widget->delete();
+
+			return true;
+		}
+
+		$parent->deleteWidget($widget);
 
 		return true;
 	}

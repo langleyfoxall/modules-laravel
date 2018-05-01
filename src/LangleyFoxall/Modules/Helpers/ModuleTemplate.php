@@ -7,7 +7,7 @@ use Illuminate\Console\OutputStyle;
 
 use LangleyFoxall\Modules\Helper;
 
-class Template
+class ModuleTemplate
 {
 	/** @var Application $app */
 	private $app;
@@ -115,7 +115,6 @@ class Template
 
 			copy($item->getRealPath(), ($path = $path . DIRECTORY_SEPARATOR . $filename));
 
-
 			if (str_contains($filename, 'Controller')) {
 				$this->updateNamespace($path, $namespace, '\Http\Controllers');
 
@@ -141,7 +140,7 @@ class Template
 	 * @param string $suffix
 	 * @return $this
 	 */
-	private function updateNamespace(string $path, string $namespace = null, string $suffix = null)
+	protected function updateNamespace(string $path, string $namespace = null, string $suffix = null)
 	{
 		if (file_exists($path)) {
 			$content = file_get_contents($path);
@@ -163,7 +162,7 @@ class Template
 	 * @param string $suffix
 	 * @return $this
 	 */
-	private function updateVariableNamespace(string $path, string $namespace = null, string $suffix = null)
+	protected function updateVariableNamespace(string $path, string $namespace = null, string $suffix = null)
 	{
 		if (file_exists($path)) {
 			$content = file_get_contents($path);

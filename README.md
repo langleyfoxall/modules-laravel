@@ -1,6 +1,6 @@
 # Modules Laravel
 
-Package for building modular laravel applications.
+Package for building modular laravel applications. Master is used for development, check versioned branches for stable releases.
 
 
 ## Installation
@@ -24,6 +24,8 @@ php artisan vendor:publish --provider="LangleyFoxall\Modules\LaravelModuleServic
 
 ## Commands
 
+### Modules
+
 To create a module simply run:
 ```
 php artisan modules:make [<parent_module>.[<tree_of_modules>.]]<module_name>
@@ -33,6 +35,20 @@ To delete a module simply run:
 ```
 php artisan modules:delete [<parent_module>.[<tree_of_modules>.]]<module_name>
 ```
+
+### Widgets
+
+To create a widget simply run:
+```
+php artisan modules:make-widget <parent_module>.[<tree_of_modules>.]<module_name>
+```
+
+To delete a widget simply run:
+```
+php artisan modules:delete-widget <parent_module>.[<tree_of_modules>.]<module_name>
+```
+
+### Misc
 
 To force generation of configuration file run:
 ```
