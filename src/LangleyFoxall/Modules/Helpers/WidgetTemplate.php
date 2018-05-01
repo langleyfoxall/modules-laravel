@@ -80,7 +80,7 @@ class WidgetTemplate extends ModuleTemplate
 
 			if (str_contains($filename, 'Provider')) {
 				$this->updateNamespace($path, $namespace, '\Providers');
-				$this->updateVariableNamespace($path, $namespace, '\Http\Controller');
+				$this->updateVariableNamespace($path, $namespace, '\Http\Controllers');
 
 				continue;
 			}
