@@ -96,6 +96,20 @@ class Repository
 
 	/**
 	 * @param string $name
+	 * @return bool
+	 */
+	public function hasModule(string $name)
+	{
+		$bits = explode('.', $name);
+		$name = array_shift($bits);
+
+		$scope = $this->modules;
+
+		return array_key_exists($name, $scope);
+	}
+
+	/**
+	 * @param string $name
 	 * @throws MissingModuleException
 	 * @return bool
 	 */
