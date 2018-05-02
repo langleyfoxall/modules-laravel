@@ -5,9 +5,10 @@ namespace LangleyFoxall\Modules;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
+use LangleyFoxall\Modules\Traits\Common;
+use LangleyFoxall\Modules\Exceptions\MissingConfigException;
 use LangleyFoxall\Modules\Exceptions\MissingSubModuleException;
 use LangleyFoxall\Modules\Exceptions\MissingWidgetException;
-use LangleyFoxall\Modules\Traits\Common;
 
 use SplFileInfo;
 use FilesystemIterator;
@@ -33,6 +34,9 @@ class Module extends ServiceProvider
 
 	/** @var Widget[] $widgets */
 	private $widgets = [];
+
+	/** @var string $config */
+	private $config;
 
 	/**
 	 * Module constructor.
@@ -81,6 +85,56 @@ class Module extends ServiceProvider
 
 		$this->loadMigrationsFrom($this->getPath() . '/Database/Migrations');
 		$this->loadViewsFrom($this->getPath() . '/Views', Helper::getModuleReference($this->name, ''));
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasConfig()
+	{
+		foreach ($this->files as $file) {
+			$bits     = explode(DIRECTORY_SEPARATOR, $file);
+			$filename = end($bits);
+
+			if ($filename === 'Config.php') {
+				return true;
+
+				break;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @throws MissingConfigException
+	 * @return mixed
+	 */
+	public function config()
+	{
+		if(!is_string($this->config)) {
+			foreach ($this->files as $file) {
+				$bits     = explode(DIRECTORY_SEPARATOR, $file);
+				$filename = end($bits);
+
+				if ($filename === 'Config.php') {
+					preg_match('/\/(app\/.*).php$/i', $file, $matches);
+					$class = str_replace([ 'app', '/' ], [ 'App', '\\' ], $matches[ 1 ]);
+
+					if (!class_exists($class, true)) {
+						throw new MissingConfigException;
+					}
+
+					return $this->config = $class;
+
+					break;
+				}
+			}
+
+			return null;
+		}
+
+		return $this->config;
 	}
 
 	/**
@@ -249,14 +303,23 @@ class Module extends ServiceProvider
 	public function scan()
 	{
 		try {
-			$pattern = $this->_constants[ 'ignore' ];
+			$path    = $this->getPath();
+			$pattern = array_map(function ($item) use ($path) {
+				return $path . DIRECTORY_SEPARATOR . $item;
+			}, $this->_constants[ 'ignore' ]);
+
 			$pattern = implode('/|', $pattern);
 			$pattern = '/' . addcslashes($pattern, '/') . '/i';
 
-			$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->getPath()));
+			$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->getPath(), \FilesystemIterator::SKIP_DOTS));
 
+			/** @var SplFileInfo $item */
 			foreach ($iterator as $item) {
 				if ($item->isDir()) {
+					continue;
+				}
+
+				if (Str::startsWith($item->getFilename(), '.')) {
 					continue;
 				}
 

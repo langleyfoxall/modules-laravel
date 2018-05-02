@@ -170,10 +170,10 @@ class Repository
 	 */
 	public function hasSubModules(string $name, bool $throw = false)
 	{
-		/** @var Module $module */
-		list($module, $parent) = $this->getSubModule($name);
+		/** @var Module|null $parent */
+		list(, $parent) = $this->getSubModule($name);
 
-		if (!empty($module->getSubModules())) {
+		if (!is_null($parent) && !empty($parent->getSubModules())) {
 			if ($throw) {
 				throw new ModuleHasSubModulesException;
 			} else {
@@ -194,10 +194,10 @@ class Repository
 	 */
 	public function hasWidgets(string $name, bool $throw = false)
 	{
-		/** @var Module $module */
-		list($module, $parent) = $this->getWidget($name);
+		/** @var Module|null $parent */
+		list(, $parent) = $this->getWidget($name);
 
-		if (!empty($module->getWidgets())) {
+		if (!is_null($parent) && !empty($parent->getWidgets())) {
 			if ($throw) {
 				throw new ModuleHasWidgetsException;
 			} else {
@@ -206,6 +206,47 @@ class Repository
 		}
 
 		return false;
+	}
+
+	/**
+	 * @return Module[]
+	 */
+	public function getModules()
+	{
+		return $this->modules;
+	}
+
+	/**
+	 * @param string $name
+	 * @throws MissingModuleException
+	 * @return Module
+	 */
+	public function getModule(string $name)
+	{
+		$bits = explode('.', $name);
+		$name = array_shift($bits);
+
+		$scope = $this->modules;
+
+		if (!array_key_exists($name, $scope)) {
+			throw new MissingModuleException($name);
+		}
+
+		return $scope[ $name ];
+	}
+
+	/**
+	 * @return Module[]
+	 */
+	public function getSubModules()
+	{
+		$sub_modules = [];
+
+		foreach ($this->modules as $module) {
+			$sub_modules = array_merge($sub_modules, $module->getSubModules());
+		}
+
+		return $sub_modules;
 	}
 
 	/**
@@ -235,6 +276,20 @@ class Repository
 		}
 
 		return [ $scope[ $name ], $parent ];
+	}
+
+	/**
+	 * @return Widget[]
+	 */
+	public function getWidgets()
+	{
+		$widgets = [];
+
+		foreach ($this->modules as $module) {
+			$widgets = array_merge($widgets, $module->getWidgets());
+		}
+
+		return $widgets;
 	}
 
 	/**
@@ -274,6 +329,20 @@ class Repository
 	/**
 	 * @param string $name
 	 * @throws MissingModuleException
+	 * @return bool
+	 */
+	public function deleteModule(string $name)
+	{
+		$module = $this->getModule($name);
+
+		$module->delete();
+
+		return true;
+	}
+
+	/**
+	 * @param string $name
+	 * @throws MissingModuleException
 	 * @throws MissingSubModuleException
 	 * @return bool
 	 */
@@ -305,7 +374,7 @@ class Repository
 	public function deleteWidget(string $name)
 	{
 		/**
-		 * @var Module      $module
+		 * @var Widget      $widget
 		 * @var Module|null $parent
 		 */
 		list($widget, $parent) = $this->getWidget($name);
