@@ -9,6 +9,20 @@ class Config
 	protected $config = [];
 
 	/**
+	 * @param $variable
+	 */
+	public function __get($variable)
+	{
+		$key = Str::snake($variable);
+
+		if (array_key_exists($key, $this->config)) {
+			echo $this->config[ $key ];
+		}
+
+		echo '';
+	}
+
+	/**
 	 * @param string $method
 	 * @param array  $args
 	 * @return mixed|null
