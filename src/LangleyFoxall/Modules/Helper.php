@@ -89,4 +89,33 @@ class Helper
 
 		return $bits ?? [];
 	}
+
+	/**
+	 * @param mixed $expression
+	 * @param bool  $return
+	 * @param int   $indent
+	 * @param bool  $indent_last
+	 * @return mixed
+	 */
+	public static function varExport($expression, $return = false, $indent = 4, $indent_last = false)
+	{
+		$object = json_decode(str_replace([ '(', ')' ], [ '(', ')' ], json_encode($expression)), true);
+		$export = str_replace([ 'array (', ')', '(', ')' ], [ '[', ']', '(', ')' ], var_export($object, true));
+		$export = preg_replace("/ => \n[^\S\n]*\[/m", ' => [', $export);
+		$export = preg_replace("/ => \[\n[^\S\n]*\]/m", ' => []', $export);
+		$spaces = str_repeat(' ', $indent);
+		$export = preg_replace("/([ ]{2})(?![^ ])/m", $spaces, $export);
+		$export = preg_replace("/^([ ]{2})/m", $spaces, $export);
+
+		if ($indent_last) {
+			$export = preg_replace('/\]$/', str_repeat(' ', $indent / 2) . ']', $export);
+		}
+
+		if ((bool)$return) {
+			return $export;
+		} else {
+			echo $export;
+			return null;
+		}
+	}
 }
