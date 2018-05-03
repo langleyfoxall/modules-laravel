@@ -125,7 +125,7 @@ class Module extends ServiceProvider
 						throw new MissingConfigException;
 					}
 
-					return $this->config = $class;
+					return $this->config = new $class;
 
 					break;
 				}

@@ -66,7 +66,7 @@ class WidgetTemplate extends ModuleTemplate
 				continue;
 			}
 
-			if (($filename = $item->getFilename()) === '.gitkeep') {
+			if (in_array(($filename = $item->getFilename()), [ '.gitkeep', 'Config.php' ])) {
 				continue;
 			}
 

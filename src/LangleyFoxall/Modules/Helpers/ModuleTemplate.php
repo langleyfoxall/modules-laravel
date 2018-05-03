@@ -128,7 +128,31 @@ class ModuleTemplate
 				continue;
 			}
 
+			if (str_contains($filename, 'Config.php')) {
+				$this->updateConfig($path);
+			}
+
 			$this->updateNamespace($path, $namespace);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param string $path
+	 * @return $this
+	 */
+	protected function updateConfig(string $path)
+	{
+		if (file_exists($path)) {
+			$content = file_get_contents($path);
+			$content = preg_replace(
+				'/\$config\s+=\s+(.*);/',
+				'$config = ' . Helper::varExport(config('modules.module.config', []), true, 8, true) . ';',
+				$content
+			);
+
+			file_put_contents($path, $content);
 		}
 
 		return $this;

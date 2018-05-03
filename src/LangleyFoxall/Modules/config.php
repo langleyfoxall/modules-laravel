@@ -15,6 +15,10 @@ return [
 			'ignore'   => [ 'Views', 'Modules', 'Widgets' ],
 			'gitkeep'  => true
 		],
+
+		'config' => [
+			'example' => false
+		]
 	],
 
 	'widget' => [

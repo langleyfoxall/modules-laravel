@@ -2,31 +2,25 @@
 
 namespace LangleyFoxall\Modules\Template;
 
-use LangleyFoxall\Modules\Interfaces\ConfigInterface;
+use Illuminate\Support\Str;
 
-class Config implements ConfigInterface
+class Config
 {
-	/**
-	 * @return bool
-	 */
-	public static function showOnSidenav()
-	{
-		return false;
-	}
+	protected $config = [];
 
 	/**
-	 * @return string|null
+	 * @param string $method
+	 * @param array  $args
+	 * @return mixed|null
 	 */
-	public static function sidenavContent()
+	public function __call(string $method, array $args)
 	{
-		return null;
-	}
+		$key = Str::snake($method);
 
-	/**
-	 * @return string|null
-	 */
-	public static function sidenavLink()
-	{
+		if (array_key_exists($key, $this->config)) {
+			return $this->config[ $key ];
+		}
+
 		return null;
 	}
 }
