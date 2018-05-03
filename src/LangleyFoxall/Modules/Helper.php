@@ -4,6 +4,10 @@ namespace LangleyFoxall\Modules;
 
 use Illuminate\Support\Str;
 
+use LangleyFoxall\Modules\Facade\Module as Service;
+use LangleyFoxall\Modules\Template\Config;
+use LangleyFoxall\Modules\Exceptions\MissingConfigException;
+
 class Helper
 {
 	/**
@@ -88,6 +92,62 @@ class Helper
 		array_pop($bits);
 
 		return $bits ?? [];
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getAuthenticatableModels()
+	{
+		/** @var Module[] $modules */
+		$modules = Service::getModules();
+		$models  = [];
+
+		foreach ($modules as $module) {
+			if ($module->hasConfig()) {
+				try {
+
+					/** @var Config $config */
+					$config  = $module->config();
+					$classes = $config->authenticatable() ?? [];
+
+					foreach ($classes as $class) {
+						if (class_exists($class)) {
+							$models[] = $class;
+						}
+					}
+				} catch (MissingConfigException $e) {
+					\Log::warning('Failed to load config', [ 'Failed to load configuration file for ' . $module->getReference() . ' Module' ]);
+				}
+			}
+		}
+
+		return $models;
+	}
+
+	/**
+	 * @param string $field
+	 * @param string $_table
+	 * @param mixed  $ignore
+	 * @return array
+	 */
+	public static function getAuthenticationUniques(string $field, string $_table = null, $ignore = null)
+	{
+		$models = self::getAuthenticatableModels();
+		$rules  = [];
+
+		foreach ($models as $model) {
+			$table = with(new $model)->getTable();
+			$rule  = 'unique:' . $table . ',' . $field;
+
+			if ($table === $_table) {
+				$rule .= ',' . $ignore;
+			}
+
+			$rules[] = $rule;
+		}
+
+		return $rules;
 	}
 
 	/**

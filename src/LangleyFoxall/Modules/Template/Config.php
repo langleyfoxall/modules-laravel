@@ -2,39 +2,28 @@
 
 namespace LangleyFoxall\Modules\Template;
 
-use Illuminate\Support\Str;
+use LangleyFoxall\Modules\Helpers\Config as BaseConfig;
 
-class Config
+class Config extends BaseConfig
 {
+	/**
+	 * @var array $config
+	 */
 	protected $config = [];
 
 	/**
-	 * @param $variable
+	 * @return string[]
 	 */
-	public function __get($variable)
+	public function dependencies()
 	{
-		$key = Str::snake($variable);
-
-		if (array_key_exists($key, $this->config)) {
-			echo $this->config[ $key ];
-		}
-
-		echo '';
+		return [];
 	}
 
 	/**
-	 * @param string $method
-	 * @param array  $args
-	 * @return mixed|null
+	 * @return string[]
 	 */
-	public function __call(string $method, array $args)
+	public function authenticatable()
 	{
-		$key = Str::snake($method);
-
-		if (array_key_exists($key, $this->config)) {
-			return $this->config[ $key ];
-		}
-
-		return null;
+		return [];
 	}
 }
