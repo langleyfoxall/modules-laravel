@@ -4,6 +4,7 @@ namespace LangleyFoxall\Modules;
 
 use Illuminate\Container\Container;
 
+use LangleyFoxall\Modules\Exceptions\MissingConfigException;
 use LangleyFoxall\Modules\Traits\Common;
 use LangleyFoxall\Modules\Exceptions\MissingModuleException;
 use LangleyFoxall\Modules\Exceptions\MissingSubModuleException;
@@ -53,8 +54,14 @@ class Repository
 		}
 	}
 
+	/**
+	 * @throws MissingModuleException
+	 * @throws MissingConfigException
+	 */
 	public function boot()
 	{
+		$missing = [];
+
 		/** @var Module $module */
 		foreach ($this->modules as $module) {
 			$module->boot();
@@ -68,6 +75,31 @@ class Repository
 			foreach ($module->getWidgets() as $widget) {
 				$widget->boot();
 			}
+
+			if ($module->hasConfig()) {
+				$reference = $module->getReference();
+				$dependencies = $module->config()->dependencies();
+
+				foreach ($dependencies as $dependency) {
+					try {
+						if (!str_contains($dependency, '.')) {
+							if (!in_array($dependency, array_keys($this->modules))) {
+								$missing[ $reference ][] = $dependency;
+							}
+
+							continue;
+						}
+
+						$this->getSubModule($dependency);
+					} catch (MissingSubModuleException $e) {
+						$missing[ $reference ][] = $dependency;
+					}
+				}
+			}
+		}
+
+		if (!empty($missing)) {
+			throw new MissingModuleException(json_encode($missing));
 		}
 	}
 
