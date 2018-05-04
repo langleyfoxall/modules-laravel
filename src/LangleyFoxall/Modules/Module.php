@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
 use LangleyFoxall\Modules\Traits\Common;
+use LangleyFoxall\Modules\Template\Config;
 use LangleyFoxall\Modules\Exceptions\MissingConfigException;
 use LangleyFoxall\Modules\Exceptions\MissingSubModuleException;
 use LangleyFoxall\Modules\Exceptions\MissingWidgetException;
@@ -35,7 +36,7 @@ class Module extends ServiceProvider
 	/** @var Widget[] $widgets */
 	private $widgets = [];
 
-	/** @var string $config */
+	/** @var Config $config */
 	private $config;
 
 	/**
@@ -108,7 +109,7 @@ class Module extends ServiceProvider
 
 	/**
 	 * @throws MissingConfigException
-	 * @return mixed
+	 * @return Config
 	 */
 	public function config()
 	{
