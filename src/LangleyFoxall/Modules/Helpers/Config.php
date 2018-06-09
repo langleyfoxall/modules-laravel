@@ -2,8 +2,6 @@
 
 namespace LangleyFoxall\Modules\Helpers;
 
-use Illuminate\Support\Str;
-
 abstract class Config
 {
 	protected $config = [];
@@ -23,13 +21,12 @@ abstract class Config
 	 */
 	public function __get($variable)
 	{
-		$key = Str::snake($variable);
 
-		if (array_key_exists($key, $this->config)) {
-			echo $this->config[ $key ];
+		if (array_key_exists($variable, $this->config)) {
+			return $this->config[ $variable ];
 		}
 
-		echo '';
+		return '';
 	}
 
 	/**
@@ -43,10 +40,8 @@ abstract class Config
 			return $this->{$method}(...$args);
 		}
 
-		$key = Str::snake($method);
-
-		if (array_key_exists($key, $this->config)) {
-			return $this->config[ $key ];
+		if (array_key_exists($method, $this->config)) {
+			return $this->config[ $method ];
 		}
 
 		return null;
