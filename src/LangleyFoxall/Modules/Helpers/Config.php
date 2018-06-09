@@ -2,8 +2,6 @@
 
 namespace LangleyFoxall\Modules\Helpers;
 
-use Illuminate\Support\Str;
-
 abstract class Config
 {
 	protected $config = [];
