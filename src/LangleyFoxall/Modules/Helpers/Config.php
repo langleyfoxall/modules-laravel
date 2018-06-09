@@ -26,10 +26,10 @@ abstract class Config
 		$key = Str::snake($variable);
 
 		if (array_key_exists($key, $this->config)) {
-			echo $this->config[ $key ];
+			return $this->config[ $key ];
 		}
 
-		echo '';
+		return '';
 	}
 
 	/**
