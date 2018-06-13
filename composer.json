@@ -3,7 +3,7 @@
   "description": "Package for building modular laravel applications",
   "minimum-stability": "dev",
   "type": "library",
-  "license": "GPL-3.0-only",
+  "license": "LGPL-3.0-only",
   "keywords": [
     "modules",
     "php",
