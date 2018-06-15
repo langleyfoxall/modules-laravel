@@ -363,6 +363,10 @@ class Module extends ServiceProvider
 	protected function loadFiles()
 	{
 		foreach ($this->getFiles() as $file) {
+			if (strpos($file, '.php') === false) {
+				continue;
+			}
+			
 			include_once $this->getPath() . Str::startsWith($file, '/') ? $file : '/' . $file;
 		}
 	}
