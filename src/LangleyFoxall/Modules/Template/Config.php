@@ -26,4 +26,12 @@ class Config extends BaseConfig
 	{
 		return [];
 	}
+	
+	/**
+	 * @return string[]
+	 */
+	public function editable()
+	{
+		return [];
+	}
 }
