@@ -18,10 +18,10 @@ abstract class Config
 
 	/**
 	 * @param $variable
+	 * @return mixed
 	 */
 	public function __get($variable)
 	{
-
 		if (array_key_exists($variable, $this->config)) {
 			return $this->config[ $variable ];
 		}
