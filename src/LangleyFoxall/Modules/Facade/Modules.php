@@ -5,7 +5,7 @@ namespace LangleyFoxall\Modules\Facade;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Class Module
+ * Class Modules
  * 
  * @method static Module[] getModules()
  * @method static Module   getModule(string $name)
@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Facade;
  * 
  * @package LangleyFoxall\Modules\Facade
  */
-class Module extends Facade
+class Modules extends Facade
 {
 	protected static function getFacadeAccessor()
 	{
