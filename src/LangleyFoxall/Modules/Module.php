@@ -143,7 +143,8 @@ class Module extends ServiceProvider
 	 */
 	public function delete()
 	{
-		$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->getPath(), FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+		$inner    = new \RecursiveDirectoryIterator($this->getPath(), \FilesystemIterator::SKIP_DOTS);
+		$iterator = new \RecursiveIteratorIterator($inner, \RecursiveIteratorIterator::SELF_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
 
 		/** @var SplFileInfo $item */
 		foreach ($iterator as $item) {
