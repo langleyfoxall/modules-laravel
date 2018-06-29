@@ -312,7 +312,8 @@ class Module extends ServiceProvider
 			$pattern = implode('/|', $pattern);
 			$pattern = '/' . addcslashes($pattern, '/') . '/i';
 
-			$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->getPath(), \FilesystemIterator::SKIP_DOTS));
+			$inner    = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
+			$iterator = new \RecursiveIteratorIterator($inner, \RecursiveIteratorIterator::SELF_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
 
 			/** @var SplFileInfo $item */
 			foreach ($iterator as $item) {
