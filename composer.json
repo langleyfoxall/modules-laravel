@@ -45,6 +45,14 @@
   "extra": {
     "branch-alias": {
       "dev-master": "0.x-dev"
+    },
+    "laravel": {
+      "providers": [
+        "LangleyFoxall\\Modules\\LaravelModuleServiceProvider"
+      ],
+      "aliases": {
+        "Module": "LangleyFoxall\\Facades\\Modules"
+      }
     }
   }
 }
