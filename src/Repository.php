@@ -36,71 +36,12 @@ class Repository
 
 	public function register()
 	{
-		$this->scan();
 
-		/** @var Module $module */
-		foreach ($this->modules as $module) {
-			$module->register();
-
-			/** @var Module $sub_module */
-			foreach ($module->getSubModules() as $sub_module) {
-				$sub_module->register();
-			}
-
-			/** @var Widget $widget */
-			foreach ($module->getWidgets() as $widget) {
-				$widget->register();
-			}
-		}
 	}
 
-	/**
-	 * @throws MissingModuleException
-	 * @throws MissingConfigException
-	 */
 	public function boot()
 	{
-		$missing = [];
-
-		/** @var Module $module */
-		foreach ($this->modules as $module) {
-			$module->boot();
-
-			/** @var Module $sub_module */
-			foreach ($module->getSubModules() as $sub_module) {
-				$sub_module->boot();
-			}
-
-			/** @var Widget $widget */
-			foreach ($module->getWidgets() as $widget) {
-				$widget->boot();
-			}
-
-			if ($module->hasConfig()) {
-				$reference = $module->getReference();
-				$dependencies = $module->config()->dependencies();
-
-				foreach ($dependencies as $dependency) {
-					try {
-						if (!str_contains($dependency, '.')) {
-							if (!in_array($dependency, array_keys($this->modules))) {
-								$missing[ $reference ][] = $dependency;
-							}
-
-							continue;
-						}
-
-						$this->getSubModule($dependency);
-					} catch (MissingSubModuleException $e) {
-						$missing[ $reference ][] = $dependency;
-					}
-				}
-			}
-		}
-
-		if (!empty($missing)) {
-			throw new MissingModuleException(json_encode($missing));
-		}
+		
 	}
 
 	/**

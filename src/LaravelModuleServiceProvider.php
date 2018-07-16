@@ -21,7 +21,6 @@ class LaravelModuleServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		$this->registerNamespaces();
-		$this->app->register(BootServiceProvider::class);
 	}
 
 	public function registerServices()
