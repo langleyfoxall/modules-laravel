@@ -39,7 +39,7 @@
   },
   "autoload": {
     "psr-4": {
-      "LangleyFoxall\\": "src/LangleyFoxall/"
+      "LangleyFoxall\\Modules\\": "src"
     }
   },
   "extra": {
