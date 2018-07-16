@@ -2,6 +2,7 @@
 namespace LangleyFoxall\Modules\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use LangleyFoxall\Modules\Events\ModulePing;
 
 class BaseModuleServiceProvider extends ServiceProvider
 {

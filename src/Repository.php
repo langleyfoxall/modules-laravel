@@ -4,6 +4,7 @@ namespace LangleyFoxall\Modules;
 
 use Illuminate\Container\Container;
 
+use LangleyFoxall\Modules\Events\ModulePing;
 use LangleyFoxall\Modules\Exceptions\MissingConfigException;
 use LangleyFoxall\Modules\Traits\Common;
 use LangleyFoxall\Modules\Exceptions\MissingModuleException;
@@ -73,12 +74,7 @@ class Repository
 	 */
 	public function hasModule(string $name)
 	{
-		$bits = explode('.', $name);
-		$name = array_shift($bits);
-
-		$scope = $this->modules;
-
-		return array_key_exists($name, $scope);
+		return (bool) event(new ModulePing($name));
 	}
 
 	/**
