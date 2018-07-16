@@ -51,7 +51,7 @@
         "LangleyFoxall\\Modules\\LaravelModuleServiceProvider"
       ],
       "aliases": {
-        "Module": "LangleyFoxall\\Facades\\Modules"
+        "Modules": "LangleyFoxall\\Facades\\Modules"
       }
     }
   }
