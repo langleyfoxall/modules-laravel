@@ -39,12 +39,20 @@
   },
   "autoload": {
     "psr-4": {
-      "LangleyFoxall\\": "src/LangleyFoxall/"
+      "LangleyFoxall\\Modules\\": "src"
     }
   },
   "extra": {
     "branch-alias": {
       "dev-master": "0.x-dev"
+    },
+    "laravel": {
+      "providers": [
+        "LangleyFoxall\\Modules\\LaravelModuleServiceProvider"
+      ],
+      "aliases": {
+        "Modules": "LangleyFoxall\\Modules\\Facade\\Modules"
+      }
     }
   }
 }
