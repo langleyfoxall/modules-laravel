@@ -19,8 +19,8 @@ class ModulePingListener
      * @param  object  $event
      * @return bool
      */
-    public function handle($event)
+    public function handle()
     {
-        return $event->moduleName == $this->moduleName;
+        return $this->moduleName;
     }
 }

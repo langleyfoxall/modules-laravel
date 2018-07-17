@@ -74,7 +74,7 @@ class Repository
 	 */
 	public function hasModule(string $name)
 	{
-		return (bool) event(new ModulePing($name));
+		return in_array($name, event(new ModulePing()));
 	}
 
 	/**
@@ -192,16 +192,7 @@ class Repository
 	 */
 	public function getModule(string $name)
 	{
-		$bits = explode('.', $name);
-		$name = array_shift($bits);
-
-		$scope = $this->modules;
-
-		if (!array_key_exists($name, $scope)) {
-			throw new MissingModuleException($name);
-		}
-
-		return $scope[ $name ];
+        return $this->createModule($name);
 	}
 
 	/**
