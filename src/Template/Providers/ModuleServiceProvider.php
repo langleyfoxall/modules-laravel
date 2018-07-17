@@ -7,6 +7,7 @@ class ModuleServiceProvider extends BaseModuleServiceProvider
 {
     /** @var string[] $providers */
     protected $providers = [
-        RouteServiceProvider::class
+        RouteServiceProvider::class,
+        EventServiceProvider::class,
     ];
 }
