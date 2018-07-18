@@ -76,6 +76,6 @@ class ModuleGenerator
 	 */
 	public function check()
 	{
-		return $this->app[ 'modules' ]->hasSubModule($this->reference);
+		return $this->app[ 'modules' ]->hasModule($this->reference);
 	}
 }
