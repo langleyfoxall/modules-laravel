@@ -4,7 +4,7 @@ namespace LangleyFoxall\Modules\Providers;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use LangleyFoxall\Modules\Events\ModulePing;
 
-class BaseModuleServiceProvider extends ServiceProvider
+abstract class BaseModuleServiceProvider extends ServiceProvider
 {
     /** @var string[] $providers */
     protected $providers = [];
@@ -18,6 +18,11 @@ class BaseModuleServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+    	$class = get_class($this);
+    	$bits = explode('\\', $class);
+
+    	$path = array_slice($bits, 1, count($bits) - 3);
+
+        $this->loadMigrationsFrom(app_path(implode('/', $path) . '/Database/Migrations'));
     }
 }
