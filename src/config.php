@@ -5,7 +5,7 @@ return [
 
 	'paths' => [
 		'modules'   => app_path('Modules'),
-		'template'  => $BASE_PATH . DIRECTORY_SEPARATOR . '/Template',
+		'template'  => $BASE_PATH . DIRECTORY_SEPARATOR . 'Template',
 		'base_path' => $BASE_PATH,
 	],
 
