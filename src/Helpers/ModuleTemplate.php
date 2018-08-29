@@ -127,6 +127,10 @@ class ModuleTemplate
 
 				continue;
 			}
+			
+			if (str_contains($filename, 'Listener')) {
+				$this->updateNamespace($path, $namespace, '\Listeners');
+			}
 
 			if (str_contains($filename, 'Config.php')) {
 				$this->updateConfig($path);
